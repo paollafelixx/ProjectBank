@@ -1,0 +1,66 @@
+import java.time.LocalDate;
+
+public class ContaValidator {
+
+    public static String validarConta(ContaRequest contaRequest) {
+        if (contaRequest.getNomeTitular() == null || contaRequest.getNomeTitular().isEmpty()) {
+            return "Nome do titular é obrigatório.";
+        }
+
+        if (!validarCPF(contaRequest.getCpfTitular())) {
+            return "CPF do titular inválido.";
+        }
+
+        LocalDate dataAtual = LocalDate.now();
+        if (contaRequest.getDataAbertura().isAfter(dataAtual)) {
+            return "Data de abertura não pode ser no futuro.";
+        }
+
+        if (contaRequest.getSaldoInicial() < 0) {
+            return "Saldo inicial não pode ser negativo.";
+        }
+
+        String tipo = contaRequest.getTipo();
+        if (!tipo.equalsIgnoreCase("corrente") && !tipo.equalsIgnoreCase("poupança") && !tipo.equalsIgnoreCase("salário")) {
+            return "Tipo de conta inválido. Os tipos válidos são: corrente, poupança, salário.";
+        }
+
+        return null; 
+    }
+
+    private static boolean validarCPF(String cpf) {
+                cpf = cpf.replaceAll("[^\\d]", "");
+                if (cpf.length() != 11) {
+                    return false;
+                }     
+                    if (cpf.matches("(\\d)\\1{10}")) {
+                    return false;
+                }       
+                
+                int soma = 0;
+                for (int i = 0; i < 9; i++) {
+                    soma += Character.getNumericValue(cpf.charAt(i)) * (10 - i);
+                }
+                int resto = soma % 11;
+                int digitoVerificador1 = (resto < 2) ? 0 : (11 - resto);        
+                
+                if (Character.getNumericValue(cpf.charAt(9)) != digitoVerificador1) {
+                    return false;
+                }
+                       
+                soma = 0;
+                for (int i = 0; i < 10; i++) {
+                    soma += Character.getNumericValue(cpf.charAt(i)) * (11 - i);
+                }
+                resto = soma % 11;
+                int digitoVerificador2 = (resto < 2) ? 0 : (11 - resto);        
+                
+                if (Character.getNumericValue(cpf.charAt(10)) != digitoVerificador2) {
+                    return false;                
+                }
+        
+                return true;
+            }
+        }
+        
+    
